@@ -49,7 +49,7 @@ For larger dimensionality data, an optional argument `point_cols` can be defined
 Calculates the outward vector for each point "B" by using the centroid of the point cloud.
 
 $$
-v_{outward} = r_{B} - r_{centroid}
+\hat v_{outward} = \frac{r_{B} - r_{centroid}}{|r_{B} - r_{centroid}|}
 $$
 
 here, 
@@ -57,11 +57,19 @@ here,
 - $r_{centroid}$ is the coordinates of the centroid of all data (computed using the average of all coordinates).
 
 To account for local geometry variability, Principal Component Analysis (PCA) is conducted for each point "B" to find the axes of maximum variability. The number of components used for PCA is the same as data dimensionality (i.e. 3 for 3D data).
-The final offset direction is determined with a weighted combination of the outward vector and weighted PCA axes. 
+The offset direction is determined with a weighted combination of the outward vector and weighted PCA axes. 
 
 $$
-d_{offset} = v_{outward} + \begin{bmatrix}w_1 \\ w_2 \\ \dots \\ w_n \end{bmatrix} \times \begin{bmatrix}\textbf{u}_1 \\ \textbf{u}_2 \\ \dots \\ \textbf{u}_n \end{bmatrix}
+d_{offset} = \hat v_{outward} + \begin{bmatrix}w_1 \\ w_2 \\ \dots \\ w_n \end{bmatrix} \cdot \begin{bmatrix}\textbf{u}_1 \\ \textbf{u}_2 \\ \dots \\ \textbf{u}_n \end{bmatrix}
 $$
+
+and normalized to get a unit vector...
+
+
+$$
+\hat d_{offset} = \frac{d_{offset}}{|d_{offset}|}
+$$
+
 
 here, 
 - $\textbf{u}_1, \dots, \textbf{u}_n$ are the principal axes determined by PCA. The number of components $n$ is the same as data dimensionality.
@@ -69,14 +77,24 @@ here,
 
 The weights assigned to each principal component axis follow an exponential decay toward 0.
 
+$$
+w = \alpha * e^{-nx}
+$$
+
+here,
+- $\alpha$ controls the weight assigned to the first principal component.
+- $n$ is the dimensionality of the data and controls the rate of decay to 0.
+  
+![Weight function](plots/weight_function.png)
+
 ## Output File Writing:
 Saves the updated dataset, including new offset points, to the specified output file.
 
-![Side-by-Side 3D Scatter Plots](3d_scatter_plots.png "Side-by-Side 3D Scatter Plots")
+![Side-by-Side 3D Scatter Plots](plots/3d_scatter_plots.png "Side-by-Side 3D Scatter Plots")
 
 Interactive plots:
-[Interactive Plotly Chart Original Dataset](original_3d_figure.html)
-[Interactive Plotly Chart Updated Dataset](updated_3d_figure.html)
+[Interactive Plotly Chart Original Dataset](plots/original_3d_figure.html)
+[Interactive Plotly Chart Updated Dataset](plots/updated_3d_figure.html)
 
 
 # Error Handling
