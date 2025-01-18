@@ -39,6 +39,50 @@ Install dependencies using:
 ```bash
 pip install numpy pandas scikit-learn matplotlib
 ```
+# Workflow
+
+## Input File Reading:
+Reads the input dataset from a space-separated text file. Dataset is stored as a `pandas` DataFrame with columns: `label`,`x`,`y`,`z`.
+For larger dimensionality data, an optional argument `point_cols` can be defined to label features accordingly.
+
+## Offset Point Calculation:
+Calculates the outward vector for each point "B" by using the centroid of the point cloud.
+
+$$
+v_{outward} = r_{B} - r_{centroid}
+$$
+
+here, 
+- $r_{B}$ is the coordinates of a "B" point of interest
+- $r_{centroid}$ is the coordinates of the centroid of all data (computed using the average of all coordinates).
+
+To account for local geometry variability, Principal Component Analysis (PCA) is conducted for each point "B" to find the axes of maximum variability. The number of components used for PCA is the same as data dimensionality (i.e. 3 for 3D data).
+The final offset direction is determined with a weighted combination of the outward vector and weighted PCA axes. The weights assigned to each principal component axis follow their corresponding explained variances.
+
+$$
+d_{offset} = v_{outward} + \begin{bmatrix}\lambda_1 \\ \lambda_2 \\ \dots \\ \lambda_n \end{bmatrix} \times \begin{bmatrix}\textbf{u}_1 \\ \textbf{u}_2 \\ \dots \\ \textbf{u}_n \end{bmatrix}
+$$
+
+here, 
+- $\lambda_1,\dots,\lambda_n$ are the explained variances (corresponding eigenvalues for each principal axis).
+- $\textbf{u}_1, \dots, \textbf{u}_n$ are the principal axes determined by PCA. The number of components $n$ is the same as data dimensionality.
+
+## Output File Writing:
+Saves the updated dataset, including new offset points, to the specified output file.
+
+![Side-by-Side 3D Scatter Plots](3d_scatter_plots.png "Side-by-Side 3D Scatter Plots")
+
+# Error Handling
+
+Missing Input File: Logs an error and exits if the file is not found.
+Invalid Parameters: Validates all inputs and raises appropriate exceptions for invalid values.
+Processing Errors: Logs errors for individual points but continues processing the rest.
+
+# Extensibility
+
+Support for Higher Dimensions: Modify --point-cols to handle additional dimensions.
+Adjust Offset Behavior: Customize the cutoff function to change how the offset is calculated.
+Dynamic Labels: Use custom labels for both input and output points.
 
 # Input File Format
 
@@ -85,33 +129,6 @@ Run the script with the following command-line options:
 ```bash
 python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C
 ```
-
-# Workflow
-
-## Input File Reading:
-Reads the input dataset from a space-separated text file.
-Dynamically assigns column names as label + specified coordinate columns.
-
-## Offset Point Calculation:
-Calculates the centroid of the point cloud.
-Uses PCA to find the principal axes.
-Offsets points outward using a combination of the outward vector and weighted PCA axes.
-
-## Output File Writing:
-Saves the updated dataset, including new offset points, to the specified output file.
-
-# Error Handling
-
-Missing Input File: Logs an error and exits if the file is not found.
-Invalid Parameters: Validates all inputs and raises appropriate exceptions for invalid values.
-Processing Errors: Logs errors for individual points but continues processing the rest.
-
-# Extensibility
-
-Support for Higher Dimensions: Modify --point-cols to handle additional dimensions.
-Adjust Offset Behavior: Customize the cutoff function to change how the offset is calculated.
-Dynamic Labels: Use custom labels for both input and output points.
-
 # Example Workflow
 
 ## Input File (`cdd.txt`):
