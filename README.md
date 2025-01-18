@@ -22,10 +22,11 @@ Ensure you have the following Python libraries installed:
 - `pandas`
 - `scikit-learn`
 - `argparse`
+- `matplotlib`
 
 Install dependencies using:
 ```bash
-pip install numpy pandas scikit-learn
+pip install numpy pandas scikit-learn matplotlib
 ```
 
 # Input File Format
