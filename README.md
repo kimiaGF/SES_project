@@ -57,15 +57,17 @@ here,
 - $r_{centroid}$ is the coordinates of the centroid of all data (computed using the average of all coordinates).
 
 To account for local geometry variability, Principal Component Analysis (PCA) is conducted for each point "B" to find the axes of maximum variability. The number of components used for PCA is the same as data dimensionality (i.e. 3 for 3D data).
-The final offset direction is determined with a weighted combination of the outward vector and weighted PCA axes. The weights assigned to each principal component axis follow their corresponding explained variances.
+The final offset direction is determined with a weighted combination of the outward vector and weighted PCA axes. 
 
 $$
-d_{offset} = v_{outward} + \begin{bmatrix}\lambda_1 \\ \lambda_2 \\ \dots \\ \lambda_n \end{bmatrix} \times \begin{bmatrix}\textbf{u}_1 \\ \textbf{u}_2 \\ \dots \\ \textbf{u}_n \end{bmatrix}
+d_{offset} = v_{outward} + \begin{bmatrix}w_1 \\ w_2 \\ \dots \\ w_n \end{bmatrix} \times \begin{bmatrix}\textbf{u}_1 \\ \textbf{u}_2 \\ \dots \\ \textbf{u}_n \end{bmatrix}
 $$
 
 here, 
-- $\lambda_1,\dots,\lambda_n$ are the explained variances (corresponding eigenvalues for each principal axis).
 - $\textbf{u}_1, \dots, \textbf{u}_n$ are the principal axes determined by PCA. The number of components $n$ is the same as data dimensionality.
+- $w_1,\dots,w_n$ are the weights assigned to each principal component axis.
+
+The weights assigned to each principal component axis follow an exponential decay toward 0.
 
 ## Output File Writing:
 Saves the updated dataset, including new offset points, to the specified output file.
