@@ -72,6 +72,11 @@ Saves the updated dataset, including new offset points, to the specified output 
 
 ![Side-by-Side 3D Scatter Plots](3d_scatter_plots.png "Side-by-Side 3D Scatter Plots")
 
+Interactive plots:
+[Interactive Plotly Chart Original Dataset](original_3d_figure.html)
+[Interactive Plotly Chart Updated Dataset](updated_3d_figure.html)
+
+
 # Error Handling
 
 Missing Input File: Logs an error and exits if the file is not found.
