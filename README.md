@@ -244,5 +244,4 @@ Entry point for the script. Parses command-line arguments and orchestrates the w
 
 ### License
 
-This script is open-source and can be freely modified or extended for your use case.
-
+This script is open-source and can be freely modified or extended for your use 
