@@ -9,7 +9,7 @@ The script identifies points with a specific label in a 3D dataset, calculates t
 ## Running script
 The script can be run from the commandline:
 ```bash
-python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C
+python script.py 
 ```
 
 or with a Docker image
@@ -76,7 +76,7 @@ Run the script with the following command-line options:
 # Required Arguments
 # Optional Arguments
 - `-i` or `--input`: Path to the input text file. (Default: `cdd.txt`)
-- `-d` or `--offset-magnitude`: Magnitude of the offset.
+- `-d` or `--offset-magnitude`: Magnitude of the offset. (Default: `2.0`)
 - `-o` or `--output`: Path to the output text file. (Default: `out.txt`)
 - `-a` or `--alpha`: Alpha value for the cutoff function. (Default: `0.5`)
 - `--point-cols`: List of column names representing the coordinates. (Default: `['x', 'y', 'z']`)
