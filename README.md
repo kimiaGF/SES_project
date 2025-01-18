@@ -189,7 +189,7 @@ C        11.5  12.6  13.2
 
 ## **Function Documentation**
 
-### 1. `cutoff_function`
+### `cutoff_function`
 Generates a polynomial decay function that transitions from a starting value to 0 over a defined number of steps.
 
 #### **Parameters**
@@ -205,7 +205,7 @@ Generates a polynomial decay function that transitions from a starting value to 
 
 ---
 
-### 2. `add_offset_points`
+### `add_offset_points`
 Applies offsets to points in a DataFrame based on PCA and outward vectors.
 
 #### **Parameters**
@@ -226,7 +226,7 @@ Applies offsets to points in a DataFrame based on PCA and outward vectors.
 
 ---
 
-### 3. `plot_coordinates`
+### `plot_coordinates`
 Creates 3D scatter plots of the original and updated datasets.
 
 #### **Parameters**
@@ -238,7 +238,7 @@ Creates 3D scatter plots of the original and updated datasets.
 
 ---
 
-### 4. `main`
+### `main`
 Entry point for the script. Parses command-line arguments and orchestrates the workflow.
 
 
