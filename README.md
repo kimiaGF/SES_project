@@ -126,6 +126,7 @@ Example Input File (input.txt):
 A 1.0 2.0 3.0
 B 4.0 5.0 6.0
 A 7.0 8.0 9.0
+...
 B 10.0 11.0 12.0
 ```
 ### Output File Format
@@ -140,8 +141,10 @@ label    x     y     z
 A        1.0   2.0   3.0
 B        4.0   5.0   6.0
 A        7.0   8.0   9.0
+...
 B        10.0  11.0  12.0
 C        5.2   6.3   7.1
+...
 C        11.5  12.6  13.2
 ```
 ## Command-Line Arguments
