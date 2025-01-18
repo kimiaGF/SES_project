@@ -73,8 +73,7 @@ C        11.5  12.6  13.2
 
 Run the script with the following command-line options:
 
-# Required Arguments
-# Optional Arguments
+## Optional Arguments
 - `-i` or `--input`: Path to the input text file. (Default: `cdd.txt`)
 - `-d` or `--offset-magnitude`: Magnitude of the offset. (Default: `2.0`)
 - `-o` or `--output`: Path to the output text file. (Default: `out.txt`)
