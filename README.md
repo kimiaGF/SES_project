@@ -1,10 +1,24 @@
-# Offset Points Generator
 
-This script processes a 3D dataset to generate new offset points for specified labeled data points. It calculates outward offsets based on a given offset magnitude and appends the new points to the dataset.
+# **Script Documentation**
 
-## Overview
+## **Overview**
+This script processes a 3D dataset to add offset points to a subset of data based on a specified label. The offset is applied in an outward direction determined by the principal components of the data. The script provides options for visualizing the results and saving the output to a file.
 
-The script identifies points with a specific label in a 3D dataset, calculates their offset in a direction pointing outward from the centroid of the point cloud, and saves the updated dataset to an output file. The offset direction is determined using PCA and a weighted cutoff function.
+---
+
+## **Features**
+1. **Cutoff Function**:
+   - Smoothly transitions a value to 0 using an exponential decay with adjustable degrees.
+2. **Add Offset Points**:
+   - Creates new points offset from the labeled points based on PCA and outward vectors.
+3. **Visualization**:
+   - Generates 3D scatter plots of the original and updated datasets.
+4. **Logging**:
+   - Provides detailed logs of operations and potential errors for debugging.
+5. **Command-Line Interface**:
+   - Flexible control over inputs, outputs, and parameters using CLI arguments.
+
+---
 
 ## Running script
 The script can be run from the commandline:
@@ -16,14 +30,6 @@ or with a Docker image
 ```bash
 docker run --rm -v "$(pwd)/.:/app/." offset-points-generator
 ```
-
-## Features
-
-- **Dynamic Input and Output**: Specify input and output file paths.
-- **Customizable Offset Parameters**: Control offset magnitude and alpha for smooth cutoff transitions.
-- **Support for Different Dimensions**: Handle 3D or higher-dimensional datasets by specifying coordinate columns.
-- **Error Handling**: Robust logging and validation to handle invalid inputs or processing errors.
-
 ---
 
 ## Dependencies
@@ -39,13 +45,13 @@ Install dependencies using:
 ```bash
 pip install numpy pandas scikit-learn matplotlib
 ```
-# Workflow
+## Workflow
 
-## Input File Reading:
+### Input File Reading:
 Reads the input dataset from a space-separated text file. Dataset is stored as a `pandas` DataFrame with columns: `label`,`x`,`y`,`z`.
 For larger dimensionality data, an optional argument `point_cols` can be defined to label features accordingly.
 
-## Offset Point Calculation:
+### Offset Point Calculation:
 Calculates the outward vector for each point "B" by using the centroid of the point cloud.
 
 $$
@@ -87,7 +93,7 @@ here,
   
 ![Weight function](plots/weight_function.png)
 
-## Output File Writing:
+### Output File Writing:
 Saves the updated dataset, including new offset points, to the specified output file.
 
 ![Side-by-Side 3D Scatter Plots](plots/3d_scatter_plots.png "Side-by-Side 3D Scatter Plots")
@@ -97,19 +103,20 @@ Interactive plots:
 [Interactive Plotly Chart Updated Dataset](plots/updated_3d_figure.html)
 
 
-# Error Handling
+## Error Handling
 
-Missing Input File: Logs an error and exits if the file is not found.
-Invalid Parameters: Validates all inputs and raises appropriate exceptions for invalid values.
-Processing Errors: Logs errors for individual points but continues processing the rest.
+- `Missing Input File`: Logs an error and exits if the file is not found.
+- `Invalid Parameters`: Validates all inputs and raises appropriate exceptions for invalid values.
+- `Processing Errors`: Logs errors for individual points but continues processing the rest.
 
-# Extensibility
+## Extensibility
 
-Support for Higher Dimensions: Modify --point-cols to handle additional dimensions.
-Adjust Offset Behavior: Customize the cutoff function to change how the offset is calculated.
-Dynamic Labels: Use custom labels for both input and output points.
+- **Support for Higher Dimensions**: Modify `--point-cols` to handle additional dimensions.
+- **Adjust Offset Behavior**: Customize the cutoff function to change how the offset is calculated.
+- **Dynamic Labels**: Use custom labels for both input and output points.
 
-# Input File Format
+## File Formatting 
+### Input File Format
 
 The input file must be space-separated and contain:
 
@@ -122,7 +129,7 @@ B 4.0 5.0 6.0
 A 7.0 8.0 9.0
 B 10.0 11.0 12.0
 ```
-# Output File Format
+### Output File Format
 
 The output file is a tab-separated text file containing:
 
@@ -138,11 +145,11 @@ B        10.0  11.0  12.0
 C        5.2   6.3   7.1
 C        11.5  12.6  13.2
 ```
-# Command-Line Arguments
+## Command-Line Arguments
 
 Run the script with the following command-line options:
 
-## Optional Arguments
+### Optional Arguments
 - `-i` or `--input`: Path to the input text file. (Default: `cdd.txt`)
 - `-d` or `--offset-magnitude`: Magnitude of the offset. (Default: `2.0`)
 - `-o` or `--output`: Path to the output text file. (Default: `out.txt`)
@@ -150,24 +157,24 @@ Run the script with the following command-line options:
 - `--point-cols`: List of column names representing the coordinates. (Default: `['x', 'y', 'z']`)
 - `-l` or `--label`: Label of the points to offset. (Default: `'B'`)
 - `--offset-label`: Label to assign to the offset points. (Default: `'C'`)
-## Example Command
+### Example Command
 ```bash
 python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C
 ```
-# Example Workflow
+## Example Workflow
 
-## Input File (`cdd.txt`):
+### Input File (`cdd.txt`):
 ```
 A 1.0 2.0 3.0
 B 4.0 5.0 6.0
 A 7.0 8.0 9.0
 B 10.0 11.0 12.0
 ```
-## Command:
+### Command:
 
 `python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C`
 
-## Output File (`out.txt`):
+### Output File (`out.txt`):
 ```
 label    x     y     z
 A        1.0   2.0   3.0
@@ -177,9 +184,64 @@ B        10.0  11.0  12.0
 C        5.2   6.3   7.1
 C        11.5  12.6  13.2
 ```
+
+## **Function Documentation**
+
+### 1. `cutoff_function`
+Generates a polynomial decay function that transitions from a starting value to 0 over a defined number of steps.
+
+#### **Parameters**
+- `alpha` (float): Starting value of the function.
+- `steps` (int): Number of steps for the transition.
+- `n_degree` (int, optional): Degree of the polynomial (default: 3).
+
+#### **Returns**
+- `np.ndarray`: Array of decayed values.
+
+#### **Raises**
+- `ValueError`: If `steps <= 0` or `alpha < 0`.
+
+---
+
+### 2. `add_offset_points`
+Applies offsets to points in a DataFrame based on PCA and outward vectors.
+
+#### **Parameters**
+- `df` (pd.DataFrame): Input DataFrame containing 3D points and labels.
+- `offset_magnitude` (float): Magnitude of the offset.
+- `point_cols` (list, optional): Column names for 3D coordinates (default: `['x', 'y', 'z']`).
+- `initial_label` (str, optional): Label of points to offset (default: `'B'`).
+- `offset_label` (str, optional): Label for new offset points (default: `'C'`).
+- `alpha` (float, optional): Weight for the cutoff function (default: `0.5`).
+
+#### **Returns**
+- `pd.DataFrame`: Updated DataFrame with offset points added.
+
+#### **Raises**
+- `TypeError`: If `df` is not a DataFrame.
+- `ValueError`: If `offset_magnitude <= 0`.
+- `KeyError`: If required columns are missing in the DataFrame.
+
+---
+
+### 3. `plot_coordinates`
+Creates 3D scatter plots of the original and updated datasets.
+
+#### **Parameters**
+- `df` (pd.DataFrame): Original dataset.
+- `updated_df` (pd.DataFrame): Updated dataset.
+
+#### **Notes**
+- Saves the plot as `3d_scatter_plots.png`.
+
+---
+
+### 4. `main`
+Entry point for the script. Parses command-line arguments and orchestrates the workflow.
+
+
+
 ### License
 
 This script is open-source and can be freely modified or extended for your use case.
 
-
-This is a complete markdown documentation covering every aspect of the script
