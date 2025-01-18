@@ -42,7 +42,7 @@ def cutoff_function(alpha, steps, n_degree=3):
     # Create a linear space from 0 to 1
     x = np.linspace(0, 1, steps)
     # Compute the cutoff values using the polynomial decay formula
-    return alpha * (1 - x**n_degree)
+    return alpha * np.exp(-n_degree * x)
 
 
 def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_label='B', offset_label='C', alpha=0.5):
