@@ -28,7 +28,7 @@ python script.py
 
 or with a Docker image
 ```bash
-docker run --rm -v "$(pwd)/.:/app/." offset-points-generator
+docker run --rm -v "$(pwd)/outputs:/app/outputs" offset-points-generator
 ```
 ---
 
