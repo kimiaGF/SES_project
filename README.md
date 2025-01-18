@@ -21,7 +21,7 @@ This script processes a 3D dataset to add offset points to a subset of data base
 ---
 
 ## Running script
-Before running these scripts, please ensure `pip` is installed on your system (see [here](https://pip.pypa.io/en/stable/installation/) for more information).The script can be run from the commandline:
+Before running these scripts, please ensure `pip` is installed on your system (see [here](https://pip.pypa.io/en/stable/installation/) for more information). The script can be run from the commandline:
 ```bash
 pip install -r requirements.txt
 python script.py 
