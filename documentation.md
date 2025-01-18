@@ -32,14 +32,14 @@ C        11.5  12.6  13.2
 Run the script with the following command-line options:
 
 # Required Arguments
-`-i` or `--input`: Path to the input text file.
-`-d` or `--offset-magnitude`: Magnitude of the offset.
 # Optional Arguments
-`-o` or `--output`: Path to the output text file. (Default: out.txt)
-`-a` or `--alpha`: Alpha value for the cutoff function. (Default: 0.5)
-`--point-cols`: List of column names representing the coordinates. (Default: ['x', 'y', 'z'])
-`-l` or `--label`: Label of the points to offset. (Default: 'B')
-`--offset-label`: Label to assign to the offset points. (Default: 'C')
+- `-i` or `--input`: Path to the input text file. (Default: `cdd.txt`)
+- `-d` or `--offset-magnitude`: Magnitude of the offset.
+- `-o` or `--output`: Path to the output text file. (Default: `out.txt`)
+- `-a` or `--alpha`: Alpha value for the cutoff function. (Default: `0.5`)
+- `--point-cols`: List of column names representing the coordinates. (Default: `['x', 'y', 'z']`)
+- `-l` or `--label`: Label of the points to offset. (Default: `'B'`)
+- `--offset-label`: Label to assign to the offset points. (Default: `'C'`)
 ## Example Command
 `python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C`
 
@@ -71,7 +71,7 @@ Dynamic Labels: Use custom labels for both input and output points.
 
 # Example Workflow
 
-## Input File (input.txt):
+## Input File (`cdd.txt`):
 ```
 A 1.0 2.0 3.0
 B 4.0 5.0 6.0
@@ -82,7 +82,7 @@ B 10.0 11.0 12.0
 
 `python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C`
 
-## Output File (output.txt):
+## Output File (`out.txt`):
 ```
 label    x     y     z
 A        1.0   2.0   3.0
