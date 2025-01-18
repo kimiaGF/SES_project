@@ -40,6 +40,7 @@ Ensure you have the following Python libraries installed:
 - `scikit-learn`
 - `argparse`
 - `matplotlib`
+- `os`
 
 Install dependencies using:
 ```bash
