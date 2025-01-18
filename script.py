@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
@@ -268,3 +269,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# %%
