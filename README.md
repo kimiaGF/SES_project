@@ -6,6 +6,17 @@ This script processes a 3D dataset to generate new offset points for specified l
 
 The script identifies points with a specific label in a 3D dataset, calculates their offset in a direction pointing outward from the centroid of the point cloud, and saves the updated dataset to an output file. The offset direction is determined using PCA and a weighted cutoff function.
 
+## Running script
+The script can be run from the commandline:
+```bash
+python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C
+```
+
+or with a Docker image
+```bash
+docker run --rm -v "$(pwd)/.:/app/." offset-points-generator
+```
+
 ## Features
 
 - **Dynamic Input and Output**: Specify input and output file paths.
@@ -72,7 +83,9 @@ Run the script with the following command-line options:
 - `-l` or `--label`: Label of the points to offset. (Default: `'B'`)
 - `--offset-label`: Label to assign to the offset points. (Default: `'C'`)
 ## Example Command
-`python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C`
+```bash
+python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C
+```
 
 # Workflow
 
