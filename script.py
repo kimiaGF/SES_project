@@ -1,4 +1,3 @@
-#%%
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
@@ -9,43 +8,7 @@ import matplotlib.pyplot as plt
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
-def cutoff_function(alpha, steps, n_degree=3):
-    """
-    Generates a cutoff function that smoothly transitions from `alpha` to `0` in `steps` using
-    a polynomial of degree `n_degree`.
-
-    Parameters:
-    ----------
-    alpha : float
-        The starting value of the function.
-    steps : int
-        The number of steps (or samples) over which the transition occurs.
-    n_degree : int, optional (default=3)
-        The degree of the polynomial used for the cutoff (e.g., 1 for linear, 2 for quadratic).
-
-    Returns:
-    -------
-    np.ndarray
-        A 1D array of `steps` values representing the cutoff function.
-
-    Raises:
-    ------
-    ValueError
-        If `steps` is less than or equal to 0, or if `alpha` is negative.
-    """
-    if steps <= 0:
-        raise ValueError("Parameter 'steps' must be greater than 0.")
-    if alpha < 0:
-        raise ValueError("Parameter 'alpha' must be non-negative.")
-    
-    # Create a linear space from 0 to 1
-    x = np.linspace(0, 1, steps)
-    # Compute the cutoff values using the polynomial decay formula
-    return alpha * (1 - x**n_degree)
-
-
-def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_label='B', offset_label='C', alpha=0.5):
+def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_label='B', offset_label='C'):
     """
     Adds offset points to a DataFrame based on points with a specific initial label, creating new points 
     at a fixed distance and in a direction pointing "outward" from the point cloud.
@@ -67,9 +30,6 @@ def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_
 
     offset_label : str, optional (default='C')
         The label assigned to the newly generated offset points.
-
-    alpha : float, optional (default=0.5)
-        The starting weight for the cutoff function, determining the emphasis of outward directionality.
 
     Returns:
     -------
@@ -100,7 +60,7 @@ def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_
     if 'label' not in df.columns:
         raise KeyError("The DataFrame must contain a 'label' column.")
 
-    logging.info(f"Starting add_offset_points with offset_magnitude={offset_magnitude}, alpha={alpha}")
+    logging.info(f"Starting add_offset_points with offset_magnitude={offset_magnitude}")
 
     # Drop missing values 
     df = df.dropna()
@@ -124,7 +84,7 @@ def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_
             outward_vector /= np.linalg.norm(outward_vector)  # Normalize to unit vector
 
             # Generate weights for the principal axes
-            weights = cutoff_function(alpha=alpha, steps=len(point_cols), n_degree=3)
+            weights = pca.explained_variance_
             # Compute the offset direction as a weighted sum of the outward vector and principal axes
             direction = outward_vector + np.dot(weights, principal_axes)
             direction /= np.linalg.norm(direction)  # Normalize again
@@ -198,9 +158,6 @@ def main():
     -d, --offset-magnitude : float (required)
         The magnitude of the offset to apply.
 
-    -a, --alpha : float (default=0.5)
-        The alpha value for the cutoff function.
-
     --point-cols : list of str (default=['x', 'y', 'z'])
         List of column names representing the 3D coordinates.
 
@@ -222,7 +179,6 @@ def main():
     parser.add_argument("-i", "--input", default='cdd.txt', help="Path to the input text file.")
     parser.add_argument("-o", "--output", default="out.txt", help="Path to the output text file.")
     parser.add_argument("-d", "--offset-magnitude", type=float, default=2.0, help="Magnitude of the offset.")
-    parser.add_argument("-a", "--alpha", type=float, default=0.5, help="Alpha value for the cutoff function.")
     parser.add_argument("--point-cols", nargs="+", default=["x", "y", "z"], help="List of coordinate column names.")
     parser.add_argument("-l", "--label", default="B", help="Label of points to offset.")
     parser.add_argument("--offset-label", default="C", help="Label for the offset points.")
@@ -246,8 +202,7 @@ def main():
             offset_magnitude=args.offset_magnitude,
             point_cols=args.point_cols,
             initial_label=args.label,
-            offset_label=args.offset_label,
-            alpha=args.alpha,
+            offset_label=args.offset_label
         )
     except Exception as e:
         logging.error(f"Error processing offset points: {e}")
