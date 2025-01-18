@@ -5,6 +5,7 @@ from sklearn.decomposition import PCA
 import logging
 import argparse
 import matplotlib.pyplot as plt 
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -179,7 +180,8 @@ def plot_coordinates(df, updated_df):
                                     markerfacecolor=color_map[label], markersize=10) for label in color_map.keys()])
 
     # Save the plot as a PNG file
-    output_path_colored = "3d_scatter_plots.png"
+    output_path_colored = "outputs/plots/3d_scatter_plots.png"
+    os.makedirs(os.path.dirname(output_path_colored), exist_ok=True)
     plt.savefig(output_path_colored)
     logging.info(f"Saved 3D scatter plot to {output_path_colored}")
 
@@ -220,7 +222,7 @@ def main():
                     "with a specific label and adds them to the dataset."
     )
     parser.add_argument("-i", "--input", default='cdd.txt', help="Path to the input text file.")
-    parser.add_argument("-o", "--output", default="out.txt", help="Path to the output text file.")
+    parser.add_argument("-o", "--output", default="outputs/out.txt", help="Path to the output text file.")
     parser.add_argument("-d", "--offset-magnitude", type=float, default=2.0, help="Magnitude of the offset.")
     parser.add_argument("-a", "--alpha", type=float, default=0.5, help="Alpha value for the cutoff function.")
     parser.add_argument("--point-cols", nargs="+", default=["x", "y", "z"], help="List of coordinate column names.")
@@ -254,6 +256,7 @@ def main():
         raise RuntimeError("Error in offset point calculation.")
 
     try:
+        os.makedirs(os.path.dirname(args.output), exist_ok=True)
         updated_df.to_csv(args.output, sep="\t", index=False)
         logging.info(f"Saved output to: {args.output}")
     except Exception as e:
