@@ -23,11 +23,13 @@ This script processes a 3D dataset to add offset points to a subset of data base
 ## Running script
 The script can be run from the commandline:
 ```bash
+pip install -r requirements.txt
 python script.py 
 ```
 
 or with a Docker image
 ```bash
+docker built -t offset-points-generator .
 docker run --rm -v "$(pwd)/outputs:/app/outputs" offset-points-generator
 ```
 ---
