@@ -61,7 +61,7 @@ here,
 - $r_{B}$ is the coordinates of a "B" point of interest
 - $r_{centroid}$ is the coordinates of the centroid of all data (computed using the average of all coordinates).
 
-To account for local geometry variability, Principal Component Analysis (PCA) is conducted for each point "B" to find the axes of maximum variability. The number of components used for PCA is the same as data dimensionality (i.e. 3 for 3D data).
+To account for local geometry variability, Principal Component Analysis (PCA) is conducted for each point "B" to find the axes of maximum variability using `sklearn.decomposition.PCA`. The number of components used for PCA is the same as data dimensionality (i.e. 3 for 3D data).
 The offset direction is determined with a weighted combination of the outward vector and weighted PCA axes. 
 
 $$
