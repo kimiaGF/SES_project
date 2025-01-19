@@ -21,13 +21,15 @@ This script processes a 3D dataset to add offset points to a subset of data base
 ---
 
 ## Running script
-The script can be run from the commandline:
+Before running these scripts, please ensure `pip` is installed on your system (see [here](https://pip.pypa.io/en/stable/installation/) for more information). The script can be run from the commandline:
 ```bash
+pip install -r requirements.txt
 python script.py 
 ```
 
 or with a Docker image
 ```bash
+docker built -t offset-points-generator .
 docker run --rm -v "$(pwd)/outputs:/app/outputs" offset-points-generator
 ```
 ---
@@ -41,11 +43,7 @@ Ensure you have the following Python libraries installed:
 - `argparse`
 - `matplotlib`
 - `os`
-
-Install dependencies using:
-```bash
-pip install numpy pandas scikit-learn matplotlib
-```
+  
 ## Workflow
 
 ### Input File Reading:
@@ -128,6 +126,7 @@ Example Input File (input.txt):
 A 1.0 2.0 3.0
 B 4.0 5.0 6.0
 A 7.0 8.0 9.0
+...
 B 10.0 11.0 12.0
 ```
 ### Output File Format
@@ -142,8 +141,10 @@ label    x     y     z
 A        1.0   2.0   3.0
 B        4.0   5.0   6.0
 A        7.0   8.0   9.0
+...
 B        10.0  11.0  12.0
 C        5.2   6.3   7.1
+...
 C        11.5  12.6  13.2
 ```
 ## Command-Line Arguments
@@ -188,7 +189,7 @@ C        11.5  12.6  13.2
 
 ## **Function Documentation**
 
-### 1. `cutoff_function`
+### `cutoff_function`
 Generates a polynomial decay function that transitions from a starting value to 0 over a defined number of steps.
 
 #### **Parameters**
@@ -204,7 +205,7 @@ Generates a polynomial decay function that transitions from a starting value to 
 
 ---
 
-### 2. `add_offset_points`
+### `add_offset_points`
 Applies offsets to points in a DataFrame based on PCA and outward vectors.
 
 #### **Parameters**
@@ -225,7 +226,7 @@ Applies offsets to points in a DataFrame based on PCA and outward vectors.
 
 ---
 
-### 3. `plot_coordinates`
+### `plot_coordinates`
 Creates 3D scatter plots of the original and updated datasets.
 
 #### **Parameters**
@@ -237,12 +238,12 @@ Creates 3D scatter plots of the original and updated datasets.
 
 ---
 
-### 4. `main`
+### `main`
 Entry point for the script. Parses command-line arguments and orchestrates the workflow.
 
 
 
 ### License
 
-This script is open-source and can be freely modified or extended for your use case.
+This script is open-source and can be freely modified or extended for your use. Not for commercial use.
 
