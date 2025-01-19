@@ -227,14 +227,14 @@ def main():
                     "with a specific label and adds them to the dataset."
     )
     parser.add_argument("-i", "--input", default='cdd.txt', help="Path to the input text file.")
-    parser.add_argument("-o", "--output", default="outputs/out.txt", help="Path to the output text file.")
+    parser.add_argument("-o", "--output", default="out.txt", help="Path to the output text file.")
     parser.add_argument("-d", "--offset-magnitude", type=float, default=2.0, help="Magnitude of the offset.")
     parser.add_argument("-a", "--alpha", type=float, default=0.5, help="Alpha value for the cutoff function.")
     parser.add_argument("--point-cols", nargs="+", default=["x", "y", "z"], help="List of coordinate column names.")
     parser.add_argument("-l", "--label", default="B", help="Label of points to offset.")
     parser.add_argument("--offset-label", default="C", help="Label for the offset points.")
     parser.add_argument("-p","--plot", default=True, help="Plot the original and updated datasets.")
-
+    
     args = parser.parse_args()
 
     try:
@@ -249,6 +249,7 @@ def main():
         raise IOError("Failed to read input file.")
 
     try:
+        # Add offset points to the DataFrame
         updated_df = add_offset_points(
             df,
             offset_magnitude=args.offset_magnitude,
@@ -262,19 +263,5 @@ def main():
         raise RuntimeError("Error in offset point calculation.")
 
     try:
-        os.makedirs(os.path.dirname(args.output), exist_ok=True)
-        updated_df.to_csv(args.output, sep=" ", index=False, header=False)
-        logging.info(f"Saved output to: {args.output}")
-    except Exception as e:
-        logging.error(f"Error writing output file: {e}")
-        raise IOError("Failed to write output file.")
-    
-    if args.plot and len(args.point_cols) == 3:
-        try:
-            plot_coordinates(df, updated_df)
-        except Exception as e:
-            logging.error(f"Error plotting datasets: {e}")
-            raise RuntimeError("Failed to plot datasets.")
-
-if __name__ == "__main__":
-    main()
+        # Save the updated DataFrame to the specified output file
+        os.makedirs(os.path.dirname(f'output
