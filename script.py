@@ -264,20 +264,4 @@ def main():
 
     try:
         # Save the updated DataFrame to the specified output file
-        os.makedirs(os.path.dirname(f'outputs/{args.output}'), exist_ok=True)
-        updated_df.to_csv(f'outputs/{args.output}', sep=" ", index=False, header=False)
-        logging.info(f"Saved output to: outputs/{args.output}")
-    except Exception as e:
-        logging.error(f"Error writing output file: {e}")
-        raise IOError("Failed to write output file.")
-    
-    if args.plot and len(args.point_cols) == 3:
-        try:
-            # Plot the original and updated datasets
-            plot_coordinates(df, updated_df)
-        except Exception as e:
-            logging.error(f"Error plotting datasets: {e}")
-            raise RuntimeError("Failed to plot datasets.")
-
-if __name__ == "__main__":
-    main()
+        os.makedirs(os.path.dirname(f'output
