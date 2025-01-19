@@ -151,13 +151,18 @@ def plot_coordinates(df, updated_df):
         df (pd.DataFrame): Original dataset.
         updated_df (pd.DataFrame): Updated dataset with offset points.
     """
-    # Define a colormap for labels
-    color_map = {'A': 'blue', 'B': 'green', 'C': 'red'}
-
+    # Define a colormap for unique labels
+    unique_labels = updated_df['label'].unique()
+    
+    colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
+    
+    # Create the dictionary mapping labels to colors
+    color_map = {label: colors[i] for i,label in enumerate(unique_labels)}
+    
     # Map the colors based on the 'label' column
     df['color'] = df['label'].map(color_map)
     updated_df['color'] = updated_df['label'].map(color_map)
-
+    
     # Create a figure with two subplots
     fig = plt.figure(figsize=(12, 6))
 
@@ -237,7 +242,8 @@ def main():
         column_names = ['label'] + args.point_cols
         # Read the input file and assign column names
         df = pd.read_csv(args.input, sep=" ", header=None, names=column_names)
-        logging.info(f"Loaded input file with columns: {column_names}")
+        logging.info(f"Loaded input file {args.input} with columns: {column_names}")
+        
     except Exception as e:
         logging.error(f"Error reading input file: {e}")
         raise IOError("Failed to read input file.")
@@ -257,13 +263,13 @@ def main():
 
     try:
         os.makedirs(os.path.dirname(args.output), exist_ok=True)
-        updated_df.to_csv(args.output, sep="\t", index=False)
+        updated_df.to_csv(args.output, sep=" ", index=False, header=False)
         logging.info(f"Saved output to: {args.output}")
     except Exception as e:
         logging.error(f"Error writing output file: {e}")
         raise IOError("Failed to write output file.")
     
-    if args.plot:
+    if args.plot and len(args.point_cols) == 3:
         try:
             plot_coordinates(df, updated_df)
         except Exception as e:
