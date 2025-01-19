@@ -12,4 +12,6 @@ COPY ./cdd.txt /app/cdd.txt
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Set the e
+# Set the entry point for the container to execute the script
+ENTRYPOINT ["python", "/app/script.py"]
+
