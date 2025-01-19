@@ -266,4 +266,9 @@ def main():
     if args.plot:
         try:
             plot_coordinates(df, updated_df)
-        except Ex
+        except Exception as e:
+            logging.error(f"Error plotting datasets: {e}")
+            raise RuntimeError("Failed to plot datasets.")
+
+if __name__ == "__main__":
+    main()
