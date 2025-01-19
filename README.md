@@ -161,7 +161,7 @@ Run the script with the following command-line options:
 - `--offset-label`: Label to assign to the offset points. (Default: `'C'`)
 ### Example Command
 ```bash
-python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C
+python script.py -i cdd.txt -o outputs/out.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C
 ```
 ## Example Workflow
 
@@ -174,7 +174,7 @@ B 10.0 11.0 12.0
 ```
 ### Command:
 
-`python script.py -i input.txt -o output.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C`
+`python script.py -i cdd.txt -o outputs/out.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C`
 
 ### Output File (`out.txt`):
 ```
