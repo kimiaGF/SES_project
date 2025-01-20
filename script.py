@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
+from sklearn.neighbors import NearestNeighbors
 import logging
 import argparse
 import matplotlib.pyplot as plt 
@@ -10,43 +11,50 @@ import os
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
-def cutoff_function(alpha, steps, n_degree=3):
+def find_offset_direction(df,point,n_neighbors=5,point_cols=['x', 'y', 'z']):
     """
-    Generates a cutoff function that smoothly transitions from `alpha` to `0` in `steps` using
-    a polynomial of degree `n_degree`.
-
-    Parameters:
-    ----------
-    alpha : float
-        The starting value of the function.
-    steps : int
-        The number of steps (or samples) over which the transition occurs.
-    n_degree : int, optional (default=3)
-        The degree of the polynomial used for the cutoff (e.g., 1 for linear, 2 for quadratic).
-
-    Returns:
-    -------
-    np.ndarray
-        A 1D array of `steps` values representing the cutoff function.
-
-    Raises:
-    ------
-    ValueError
-        If `steps` is less than or equal to 0, or if `alpha` is negative.
+        Finds the offset direction for a given point in a DataFrame using general outward vector and PCA.
+        
+        Parameters:
+        df : pandas.DataFrame
+            The DataFrame containing the point cloud data.
+        point : pandas.Series
+            The point for which the offset direction is to be calculated.
+        n_neighbors : int, optional (default=5)
+            The number of nearest neighbors to consider for PCA.
+        point_cols : list of str, optional (default=['x', 'y', 'z'])
+            The names of the columns in `df` representing the coordinates of the points in 3D space. Can be extended to more dimensions.
+            
+        Returns:
+        np.ndarray
+            The offset direction as a unit vector.
     """
-    if steps <= 0:
-        raise ValueError("Parameter 'steps' must be greater than 0.")
-    if alpha < 0:
-        raise ValueError("Parameter 'alpha' must be non-negative.")
+    # Format point cloud and query point for consistency
+    point_cloud = df[point_cols]
+    query_point = pd.DataFrame([point[point_cols].values],columns=point_cols)
     
-    # Create a linear space from 0 to 1
-    x = np.linspace(0, 1, steps)
-    # Compute the cutoff values using the polynomial decay formula
-    return alpha * np.exp(-n_degree * x)
+    # Find the outward vector from the point cloud center to the point
+    outward_vector = query_point.values[0] - point_cloud.mean()
+    unit_outward_vector = outward_vector / np.linalg.norm(outward_vector)  # Normalize to unit vector
+    
+    # Find local geometry of the point using KNN and PCA
+    knn = NearestNeighbors(n_neighbors=n_neighbors,algorithm='auto')
+    knn.fit(point_cloud)
+    distances, indices = knn.kneighbors(query_point)
+    neighbor_list = point_cloud.iloc[indices[0]]
 
+    pca = PCA(n_components=len(point_cols))
+    pca.fit(neighbor_list)
+    principal_axes = pca.components_
+    principal_values = pca.explained_variance_ratio_
+    
+    # Offset direction accounting for local geometry
+    direction = outward_vector + np.dot(principal_values, principal_axes)
+    unit_direction = direction / np.linalg.norm(direction)  # Normalize 
+    
+    return unit_direction
 
-def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_label='B', offset_label='C', alpha=0.5):
+def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_label='B', offset_label='C', n_neighbors=5):
     """
     Adds offset points to a DataFrame based on points with a specific initial label, creating new points 
     at a fixed distance and in a direction pointing "outward" from the point cloud.
@@ -68,9 +76,9 @@ def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_
 
     offset_label : str, optional (default='C')
         The label assigned to the newly generated offset points.
-
-    alpha : float, optional (default=0.5)
-        The starting weight for the cutoff function, determining the emphasis of outward directionality.
+        
+    n_neighbors : int, optional (default=5)
+        The number of nearest neighbors to consider for PCA.
 
     Returns:
     -------
@@ -101,39 +109,23 @@ def add_offset_points(df, offset_magnitude, point_cols=['x', 'y', 'z'], initial_
     if 'label' not in df.columns:
         raise KeyError("The DataFrame must contain a 'label' column.")
 
-    logging.info(f"Starting add_offset_points with offset_magnitude={offset_magnitude}, alpha={alpha}")
-
-    # Drop missing values 
+    logging.info(f"Starting add_offset_points with offset_magnitude={offset_magnitude}, n_neighbors={n_neighbors}")    
+    
+    # Clean df and filter points with the specified initial label
     df = df.dropna()
-
-    # Filter points with the specified initial label
     labeled_points = df[df['label'] == initial_label]
     logging.info(f"Found {len(labeled_points)} points with label '{initial_label}'")
 
     for idx, point in labeled_points.iterrows():
         try:
             # Compute the centroid of the point cloud
-            centroid = df[point_cols].mean()
-
-            # Perform PCA to find the principal axes of the point cloud
-            pca = PCA(n_components=len(point_cols))
-            pca.fit(df[point_cols])
-            principal_axes = pca.components_
-
-            # Compute the outward vector from the centroid to the current point
-            outward_vector = point[point_cols] - centroid
-            outward_vector /= np.linalg.norm(outward_vector)  # Normalize to unit vector
-
-            # Generate weights for the principal axes
-            weights = cutoff_function(alpha=alpha, steps=len(point_cols), n_degree=3)
-            # Compute the offset direction as a weighted sum of the outward vector and principal axes
-            direction = outward_vector + np.dot(weights, principal_axes)
-            direction /= np.linalg.norm(direction)  # Normalize again
-
+            direction = find_offset_direction(df, point, point_cols=point_cols, n_neighbors=n_neighbors)
+            
             # Create a new offset point
             offset_point = point.copy()
             offset_point[point_cols] += direction * offset_magnitude
             offset_point['label'] = offset_label
+            
             # Append the offset point to the DataFrame
             df = pd.concat([df, offset_point.to_frame().T], ignore_index=True)
 
@@ -205,9 +197,6 @@ def main():
     -d, --offset-magnitude : float (required)
         The magnitude of the offset to apply.
 
-    -a, --alpha : float (default=0.5)
-        The alpha value for the cutoff function.
-
     --point-cols : list of str (default=['x', 'y', 'z'])
         List of column names representing the 3D coordinates.
 
@@ -229,11 +218,11 @@ def main():
     parser.add_argument("-i", "--input", default='cdd.txt', help="Path to the input text file.")
     parser.add_argument("-o", "--output", default="out.txt", help="Path to the output text file.")
     parser.add_argument("-d", "--offset-magnitude", type=float, default=2.0, help="Magnitude of the offset.")
-    parser.add_argument("-a", "--alpha", type=float, default=0.5, help="Alpha value for the cutoff function.")
     parser.add_argument("--point-cols", nargs="+", default=["x", "y", "z"], help="List of coordinate column names.")
     parser.add_argument("-l", "--label", default="B", help="Label of points to offset.")
     parser.add_argument("--offset-label", default="C", help="Label for the offset points.")
     parser.add_argument("-p","--plot", default=True, help="Plot the original and updated datasets.")
+    parser.add_argument("-n", "--neighbors", type=int, default=5, help="Number of neighbors for PCA.")
     
     args = parser.parse_args()
 
@@ -255,9 +244,9 @@ def main():
             offset_magnitude=args.offset_magnitude,
             point_cols=args.point_cols,
             initial_label=args.label,
-            offset_label=args.offset_label,
-            alpha=args.alpha,
-        )
+            offset_label=args.offset_label
+            )
+        logging.info("Updated database with offset points.")
     except Exception as e:
         logging.error(f"Error processing offset points: {e}")
         raise RuntimeError("Error in offset point calculation.")
@@ -279,5 +268,8 @@ def main():
             logging.error(f"Error plotting datasets: {e}")
             raise RuntimeError("Failed to plot datasets.")
 
+    # Output the updated DataFrame to the console
+    print(updated_df[['label', *args.point_cols]])
+    
 if __name__ == "__main__":
     main()
