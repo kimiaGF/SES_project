@@ -1,28 +1,21 @@
-
-# **Script Documentation**
+# **Offset Points Generator**
 
 ## **Overview**
-This script processes a 3D dataset to add offset points to a subset of data based on a specified label. The offset is applied in an outward direction determined by the principal components of the data. The script provides options for visualizing the results and saving the output to a file.
+The Offset Points Generator is a Python-based tool designed to process 3D datasets, adding offset points to specific subsets based on labels. It calculates outward directions for these points by considering the overall centroid and local geometry using PCA (Principal Component Analysis).
+
+This project has been containerized using Docker to ensure easy deployment and consistent runtime environments.
 
 ---
 
 ## **Features**
-1. **Add Offset Points**:
-   - Offsets points away from point cloud.
-2. **Generalizable to Irregular Shapes**:
-   - Adjusts for local point geometry using K-nearest Neighbor analysis and Principal Component Analysis (PCA).
-3. **Generalizeable to N-dimensional Input**:
-   - Can add points in N-dimensional space.
-4. **Accounts for All Points in Cloud**:
-   - Point cloud is redefined any time a new point is added for maximum point dispursion.
-5. **Generalizable to Any Label**:
-   - Can offset atoms with label "A" or "B" (or any other incoming label) by defining "-l" argument from the commandline.
-6. **Visualization**:
-   - Generates 3D scatter plots of the original and updated datasets. 
-7. **Logging**:
-   - Provides detailed logs of operations and potential errors for debugging.
-8. **Command-Line Interface**:
-   - Flexible control over inputs, outputs, and parameters using CLI arguments.
+- **Add Offset Points**: Adds outward-offset points to labeled data based on PCA.
+- **Flexible Dimensionality**: Supports 3D or N-dimensional input datasets.
+- **Dynamic Labeling**: Works with customizable labels for both input and offset points.
+- **Visualization**: Generates 3D scatter plots for original and updated datasets.
+- **Command-Line Interface (CLI)**: Offers customizable inputs via arguments.
+- **Easy Deployment**: Containerized using Docker for seamless usage.
+
+---
 
 **Complexity**: $O(n_{neighbors}\cdot D^2)$ where $n_{neighbors}$ is the number of neighbors to search through for each point and $D$ is data dimensionality (e.g. 3 for 3D)
 
@@ -37,9 +30,9 @@ This script processes a 3D dataset to add offset points to a subset of data base
 - `os`
   
 ## Running script
-The script can be run within a Docker image. 
+Ensure Docker is installed on your machine. The script can be run within a Docker image. 
 ```bash
-docker build -t offset-points-generator .
+docker pull kimiagf/offset-points-generator
 docker run --rm -v "$(pwd)/outputs:/app/outputs" offset-points-generator
 ```
 ---
