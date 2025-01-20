@@ -15,14 +15,17 @@ This script processes a 3D dataset to add offset points to a subset of data base
    - Can add points in N-dimensional space.
 4. **Accounts for All Points in Cloud**:
    - Point cloud is redefined any time a new point is added for maximum point dispursion.
-5. **Visualization**:
+5. **Generalizable to Any Label**:
+   - Can offset atoms with label "A" or "B" (or any other incoming label) by defining "-l" argument from the commandline.
+6. **Visualization**:
    - Generates 3D scatter plots of the original and updated datasets. 
-6. **Logging**:
+7. **Logging**:
    - Provides detailed logs of operations and potential errors for debugging.
-7. **Command-Line Interface**:
+8. **Command-Line Interface**:
    - Flexible control over inputs, outputs, and parameters using CLI arguments.
 
 **Complexity**: $O(n_{neighbors}\cdot D^2)$ where $n_{neighbors}$ is the number of neighbors to search through for each point and $D$ is data dimensionality (e.g. 3 for 3D)
+
 ---
 ## Dependencies
 
@@ -76,8 +79,6 @@ $$
 here, 
 - $\textbf{u}_1, \dots, \textbf{u}_n$ are the principal axes determined by PCA. The number of components $n$ is the same as data dimensionality.
 - $\lambda_1,\dots,\lambda_n$ are the explained variance ratios for their corresponding principal components.
-  
-![Weight function](plots/weight_function.png)
 
 ### Output File Writing:
 Saves the updated dataset, including new offset points, to the specified output file.
@@ -148,8 +149,9 @@ Run the script with the following command-line options:
 - `--offset-label`: Label to assign to the offset points. (Default: `'C'`)
 ### Example Command
 ```bash
-python script.py -i cdd.txt -o out.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C
+python script.py -i cdd.txt -o out.txt --point-cols x y z -d 3.0 -n 5 -l B --offset-label C
 ```
+Uses `./cdd.txt` as the input file and outputs data to `outputs/out.txt`. Points with coordinate names `x`, `y`, and `z` are offset by magnitude `3.0` with PCA analysis running on the nearest `5` points for each `B` labeled point. Offset points are given the label `C`. 
 ## Example Workflow
 
 ### Input File (`cdd.txt`):
@@ -159,10 +161,10 @@ B 4.0 5.0 6.0
 A 7.0 8.0 9.0
 B 10.0 11.0 12.0
 ```
-### Command:
-
-`python script.py -i cdd.txt -o out.txt -d 3.0 -a 0.5 --point-cols x y z -l B --offset-label C`
-
+### Example Command
+```bash
+python script.py 
+```
 ### Output File (`out.txt`):
 ```
 label    x     y     z
