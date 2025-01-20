@@ -1,4 +1,4 @@
-# Use a lightweight Linux base image with Python installed
+# Use a lightweight Linux base image 
 FROM debian:bullseye-slim
 
 # Install Python and necessary tools
